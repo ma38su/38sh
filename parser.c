@@ -8,12 +8,28 @@
 
 #include "38sh.h"
 
+#define DEFAULT_BUF_SIZE 1024
+
 static char *read_line(FILE *f);
 static char *expect_cmd(TokenPtr *tp);
 static char *consume_arg(TokenPtr *tp);
 
-void do_cd(const char *dir) {
+void do_cd(const Vector *argv) {
+  char *dir;
+  int argc = argv->size;
+  if (argc == 0) die("illegal cd");
+  if (argc == 1) {
+    dir = "~/";
+  } else if (argc == 2) {
+    dir = (char*) vec_get(argv, 1);
+  } else {
+    dir = (char*) vec_get(argv, 1);
+    printf("cd: string not in pwd: %s\n", vec_get(argv, 1));
+    return;
+  }
+  if (chdir(dir) < 0) die(dir);
 }
+
 void do_sh(const char *path) {
   FILE *f;
   TokenPtr tp;
@@ -26,6 +42,8 @@ void do_sh(const char *path) {
   } else {
     f = stdin;
   }
+
+  printf("$ ");
 
   char *line;
   while ((line = read_line(f)) != NULL) {
@@ -45,14 +63,8 @@ void do_sh(const char *path) {
 
       if (strcmp(cmd, "exit") == 0) {
         exit(0);
-      } else if (strcmp(cmd, "cd") == 0) {
-        char *dir;
-        if (argv->size > 1) {
-          dir = (char*) vec_get(argv, 1);
-        } else {
-          dir = "~/";
-        }
-        do_cd(dir);
+      } else if (strcmp(cmd, "chdir") == 0 || strcmp(cmd, "cd") == 0) {
+        do_cd(argv);
       } else {
         do_exec(cmd, argv);
         if (!tp.token) {
@@ -60,6 +72,7 @@ void do_sh(const char *path) {
         }
       }
       tp.token = tp.token->next;
+      printf("$ ");
     }
   }
   fclose(f);
@@ -84,8 +97,8 @@ static char *consume_arg(TokenPtr *tp) {
 }
 
 static char *read_line(FILE *f) {
-  static char BUF[1024];
-  if (fgets(BUF, 1024, f) == NULL) {
+  static char BUF[DEFAULT_BUF_SIZE];
+  if (fgets(BUF, DEFAULT_BUF_SIZE, f) == NULL) {
     return NULL;
   }
   return BUF;
