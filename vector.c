@@ -34,7 +34,7 @@ void vec_add(Vector *vector, void *value) {
   vector->_array[vector->size++] = value;
 }
 
-void *vec_get(Vector *vector, int index) {
+void *vec_get(const Vector *vector, const int index) {
   return vector->_array[index];
 }
 

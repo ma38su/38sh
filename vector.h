@@ -12,6 +12,6 @@ struct Vector {
 Vector *new_vector();
 
 void vec_add(Vector *vector, void *value);
-void *vec_get(Vector *vector, int index);
+void *vec_get(const Vector *vector, const int index);
 
 #endif

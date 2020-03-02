@@ -61,7 +61,7 @@ Token *tokenize(char *p) {
       p += 2;
       continue;
     }
-    if (strchr("|&", *p)) {
+    if (strchr("|&>", *p)) {
       cur = new_token(TK_RESERVED, cur, p++);
       cur->len = 1;
       continue;
@@ -91,7 +91,7 @@ static Token *new_token(TokenKind kind, Token *cur, char *str) {
 
 static int text_len(char *p0) {
   char *p = p0;
-  while (!strchr("|&", *p) && !isspace(*p)) {
+  while (!strchr("|&>", *p) && !isspace(*p)) {
     p++;
   }
   return p - p0;
