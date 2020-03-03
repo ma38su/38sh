@@ -13,7 +13,7 @@
 static void connect(int fd1, int fd2);
 static void do_exec(Stmt *stmt);
 static void do_cd(const Vector *argv);
-static char* get_exec(char* cmd);
+static bool search_exec(char *cmd, char *buf);
 
 bool __debug = false;
 
@@ -50,25 +50,21 @@ static void do_exec(Stmt *stmt)
 
   Vector *vargv;
 
-  char *cmd;
+  char cmd[1024];
   char **argv;
+
+  if (!search_exec(stmt->cmd, cmd)) {
+    printf("command not found: %s\n", stmt->cmd);
+    return;
+  }
 
   vargv = stmt->argv;
   len = vargv->size + 1;
 
-  cmd = get_exec(stmt->cmd);
-  if (!cmd) {
-    printf("%s is not found\n", stmt->cmd);
-  }
-
-  argv = calloc(len, sizeof(char*));
-  for (i = 0; i < vargv->size; ++i) {
-    argv[i] = (char*) vec_get(vargv, i);
-  }
-
   pid = fork();
   if (pid < 0) die("fork(2) failed");
   if (pid == 0) {
+
     //printf("fork %s\n", stmt->cmd);
     if (stmt->in >= 0) {
       //printf("%s in\n", stmt->cmd);
@@ -87,6 +83,10 @@ static void do_exec(Stmt *stmt)
       do_exec(stmt->next);
     }
 
+    argv = calloc(vargv->size + 1, sizeof(char*));
+    for (i = 0; i < vargv->size; ++i) {
+      argv[i] = (char*) vec_get(vargv, i);
+    }
     execv(cmd, argv);
     die(cmd);
   }
@@ -119,35 +119,31 @@ static void do_cd(const Vector *argv)
   if (chdir(dir) < 0) die(dir);
 }
 
-static char* get_exec(char* cmd)
+static bool search_exec(char* cmd, char* buf)
 {
   char *env_paths;
   char paths[1024];
   char *path;
 
   if (strchr("./", *cmd)) {
-    return cmd;
+    return is_file(cmd);
   }
 
   env_paths = getenv("PATH");
   if (!env_paths) {
-    return cmd;
+    return is_file(cmd);
   }
 
   strcpy(paths, env_paths);
   path = strtok(paths, ":");
-
   while (path) {
-    int buf_len = strlen(path) + 1 + strlen(cmd) + 1;
-    char *buf = calloc(buf_len, sizeof(char));
     strcpy(buf, path);
     strcat(buf, "/");
     strcat(buf, cmd);
     if (is_file(buf)) {
-      return buf;
+      return true;
     }
-    free(buf);
     path = strtok(NULL, ":");
   }
-  return NULL;
+  return false;
 }
