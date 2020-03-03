@@ -5,6 +5,7 @@
 
 typedef struct Token Token;
 typedef struct TokenPtr TokenPtr;
+typedef struct Stmt Stmt;
 
 typedef enum {
   TK_RESERVED,
@@ -21,10 +22,19 @@ struct Token {
 };
 
 struct TokenPtr {
-    Token *token;
+  Token *token;
 };
 
-void do_exec(const char *cmd, const Vector *argv);
+struct Stmt {
+  char* cmd;
+  Vector* argv;
+  Stmt *next;
+
+  int in;
+  int out;
+};
+
+void do_stmt(Stmt *stmt);
 void die(const char *fmt, ...);
 
 void do_sh(const char *path);

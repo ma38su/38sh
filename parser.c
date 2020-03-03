@@ -4,33 +4,57 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "38sh.h"
 
 #define DEFAULT_BUF_SIZE 1024
 
 static char *read_line(FILE *f);
+
 static char *expect_cmd(TokenPtr *tp);
 static char *consume_arg(TokenPtr *tp);
+static bool consume(TokenPtr *tp, char *op);
 
-void do_cd(const Vector *argv) {
-  char *dir;
-  int argc = argv->size;
-  if (argc == 0) die("illegal cd");
-  if (argc == 1) {
-    dir = "~/";
-  } else if (argc == 2) {
-    dir = (char*) vec_get(argv, 1);
-  } else {
-    dir = (char*) vec_get(argv, 1);
-    printf("cd: string not in pwd: %s\n", vec_get(argv, 1));
-    return;
+static Stmt *stmt(TokenPtr *tp);
+static Stmt *parse(TokenPtr *tp);
+
+static void print_header();
+
+static Stmt *parse(TokenPtr *tp)
+{
+  Stmt *st = stmt(tp);
+  if (consume(tp, "|")) {
+    st->next = parse(tp);
   }
-  if (chdir(dir) < 0) die(dir);
+  return st;
 }
 
-void do_sh(const char *path) {
+static Stmt *stmt(TokenPtr *tp)
+{
+  Stmt *st;
+  st = calloc(1, sizeof(Stmt));
+
+  st->cmd = expect_cmd(tp);
+  st->argv = new_vector();
+  st->in = -1;
+  st->out = -1;
+
+  vec_add(st->argv, st->cmd);
+  while (tp->token) {
+    char *arg = consume_arg(tp);
+    if (!arg) {
+      break;
+    }
+    vec_add(st->argv, arg);
+  }
+  return st;
+}
+
+void do_sh(const char *path)
+{
   FILE *f;
   TokenPtr tp;
 
@@ -43,39 +67,23 @@ void do_sh(const char *path) {
     f = stdin;
   }
 
-  printf("$ ");
+  print_header();
 
   char *line;
   while ((line = read_line(f)) != NULL) {
     tp.token = tokenize(line);
-
-    while (tp.token) {
-      char *cmd = expect_cmd(&tp);
-      Vector *argv = new_vector();
-      vec_add(argv, cmd);
-      while (tp.token) {
-        char *arg = consume_arg(&tp);
-        if (!arg) {
-          break;
-        }
-        vec_add(argv, arg);
-      }
-
-      if (strcmp(cmd, "exit") == 0) {
-        exit(0);
-      } else if (strcmp(cmd, "chdir") == 0 || strcmp(cmd, "cd") == 0) {
-        do_cd(argv);
-      } else {
-        do_exec(cmd, argv);
-        if (!tp.token) {
-          break;
-        }
-      }
-      tp.token = tp.token->next;
-      printf("$ ");
+    Stmt *stmt = parse(&tp);
+    while (stmt) {
+      do_stmt(stmt);
+      stmt = stmt->next;
     }
+    print_header();
   }
   fclose(f);
+}
+
+static void print_header() {
+  printf("38sh$ ");
 }
 
 static char *expect_cmd(TokenPtr *tp) {
@@ -85,6 +93,17 @@ static char *expect_cmd(TokenPtr *tp) {
   char *cmd = substr(tp->token->str, tp->token->len);
   tp->token = tp->token->next;
   return cmd;
+}
+
+static bool consume(TokenPtr *tp, char *op) {
+  if (tp->token && tp->token->kind == TK_RESERVED
+      && strlen(op) == tp->token->len
+      && memcmp(op, tp->token->str, tp->token->len) == 0) {
+
+    tp->token = tp->token->next;
+    return true;
+  }
+  return false;
 }
 
 static char *consume_arg(TokenPtr *tp) {
