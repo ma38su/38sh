@@ -23,6 +23,7 @@ struct Token {
 };
 
 struct TokenPtr {
+  Token *head;
   Token *token;
 };
 
@@ -44,7 +45,8 @@ void prompt(const char *path);
 
 char *substr(char *str, int len);
 
-Token *tokenize(char *p);
+TokenPtr *tokenize(char *p);
+void free_token(TokenPtr *ptr);
 char *token_to_s(Token *token);
 
 extern bool term;

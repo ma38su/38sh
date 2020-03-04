@@ -8,7 +8,8 @@
 static int text_len(char *p0);
 static Token *new_token(TokenKind kind, Token *cur, char *str);
 
-static char *next_ptr(char *p0, char c) {
+static char *next_ptr(char *p0, char c)
+{
   char *p = p0;
   while (*p != c) {
     p++;
@@ -16,7 +17,22 @@ static char *next_ptr(char *p0, char c) {
   return p;
 }
 
-Token *tokenize(char *p) {
+void free_token(TokenPtr *ptr)
+{
+  Token *token;
+  Token *tmp;
+  token = ptr->head;
+  while (token) {
+    tmp = token;
+    token = token->next;
+    free(tmp);
+  }
+  free(ptr);
+}
+
+TokenPtr *tokenize(char *p)
+{
+
   Token head;
   head.next = NULL;
   Token *cur = &head;
@@ -108,10 +124,17 @@ Token *tokenize(char *p) {
     }
     die("unexpected token");
   }
-  return head.next;
+
+  TokenPtr *ptr;
+  ptr = calloc(1, sizeof(TokenPtr));
+
+  ptr->head = head.next;
+  ptr->token = head.next;
+  return ptr;
 }
 
-static Token *new_token(TokenKind kind, Token *cur, char *str) {
+static Token *new_token(TokenKind kind, Token *cur, char *str)
+{
   Token *tok = calloc(1, sizeof(Token));
   tok->kind = kind;
   tok->str = str;
@@ -119,7 +142,8 @@ static Token *new_token(TokenKind kind, Token *cur, char *str) {
   return tok;
 }
 
-static int text_len(char *p0) {
+static int text_len(char *p0)
+{
   char *p = p0;
   while (!strchr("|&><;", *p) && !isspace(*p)) {
     p++;
@@ -127,4 +151,7 @@ static int text_len(char *p0) {
   return p - p0;
 }
 
-char *token_to_s(Token *token) { return substr(token->str, token->len); }
+char *token_to_s(Token *token) {
+  return substr(token->str, token->len); 
+}
+

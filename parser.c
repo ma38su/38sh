@@ -65,7 +65,7 @@ void prompt(const char *path)
 {
   int i;
   FILE *f;
-  TokenPtr tp;
+  TokenPtr *tp;
 
   if (path) {
     f = fopen(path, "r");
@@ -85,24 +85,27 @@ void prompt(const char *path)
     line = read_line(f);
     if (!line) break;
 
-    tp.token = tokenize(line);
-    if (!tp.token) {
+    tp = tokenize(line);
+    if (!tp->token) {
       continue;
     }
 
     do {
-      Cmd *cmd = parse(&tp);
+      Cmd *cmd = parse(tp);
       vec_add(cmds, cmd);
-    } while (consume(&tp, "&&") || consume(&tp, ";"));
-    if (tp.token) {
+    } while (consume(tp, "&&") || consume(tp, ";"));
+
+    if (tp->token) {
       fprintf(stderr, "syntax error\n");
       continue;
     }
+
     for (i = 0; i < cmds->size; ++i) {
       Cmd *cmd = vec_get(cmds, i);
       do_cmd(cmd);
     }
     vec_clear(cmds);
+    free_token(tp);
   }
   fclose(f);
 }
