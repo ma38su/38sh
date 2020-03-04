@@ -53,8 +53,12 @@ $ command1 < File1 | command2 > File2
 ### Multi Commands in one line
 
 ```
-$ command1 && command2
-$ command1; command2
+$ echo hello && world
+hello
+world
+$ echo hello; echo world
+hello
+world
 ```
 
 ## Author
