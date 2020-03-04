@@ -61,7 +61,7 @@ TokenPtr *tokenize(char *p)
     if (*p == '"') {
       p++;
 
-      cur = new_token(TK_STR, cur, p);
+      cur = new_token(TK_TEXT, cur, p);
 
       char *p0 = p;
       p = next_ptr(p, '"');

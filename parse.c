@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -174,13 +175,50 @@ static char *expect_arg(TokenPtr *tp)
   return arg;
 }
 
+char *extract_env(char *str, int len) {
+  char buf[2048];
+  char *p0, *p;
+
+  buf[0] = '\0';
+  p0 = str;
+  p = memchr(p0, '$', len);
+  if (!p) return substr(str, len);
+  while (p) {
+    strncat(buf, p0, p - p0);
+    len -= p - p0;
+    p0 = p++;
+    if (*p == '{') {
+      ++p;
+      while ((p - p0) < len && *p != '}') ++p;
+      if ((p - p0) >= len) break;
+      char *key = substr(p0 + 2, p - p0 - 2);
+      char *val = getenv(key); 
+      p++;
+      strcat(buf, val);
+    } else {
+      while ((p - p0) < len && !isspace(*p) && *p != '$') ++p;
+      char *key = substr(p0 + 1, p - p0 - 1);
+      char *val = getenv(key); 
+      strcat(buf, val);
+    }
+    len -= p - p0;
+    p0 = p;
+    p = memchr(p0, '$', len);
+  }
+  strncat(buf, p0, len);
+  return substr(buf, strlen(buf));
+}
+
 static char *consume_arg(TokenPtr *tp)
 {
-  if (tp->token->kind != TK_TEXT && tp->token->kind != TK_STR) {
-    return NULL;
+  char *arg = NULL;
+  if (tp->token->kind == TK_STR) {
+    arg = substr(tp->token->str, tp->token->len);
+    tp->token = tp->token->next;
+  } else if (tp->token->kind == TK_TEXT) {
+    arg = extract_env(tp->token->str, tp->token->len);
+    tp->token = tp->token->next;
   }
-  char *arg = substr(tp->token->str, tp->token->len);
-  tp->token = tp->token->next;
   return arg;
 }
 
