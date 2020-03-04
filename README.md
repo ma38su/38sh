@@ -46,8 +46,8 @@ $ command1 | command2 # Pipe
 Input/Output Redirection and Pipe can be used in combination.
 
 ```
-$ command < file1 > file2      # file1 to STDIN, STDOUT to file2
-$ command1 < file1 | commmand2 | command3 > file2 # file1 to STDIN, STDOUT to file2
+$ command < File1 > File2
+$ command1 < File1 | command2 > File2
 ```
 
 ## Author
