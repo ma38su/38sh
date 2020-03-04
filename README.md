@@ -18,7 +18,9 @@ make
 ./38sh
 ```
 
-### Supported Built-in Command
+## Supported Features
+
+### Built-in Command
 - cd/chdir
 - exit
 
