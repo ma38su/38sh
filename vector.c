@@ -41,7 +41,7 @@ void *vec_get(const Vector *vector, const int index) {
   return vector->_array[index];
 }
 
-void vec_clear(Vector *vector) {
-  vector->size = 0;
+void vec_clear(Vector *vec) {
+  vec->size = 0;
 }
 

@@ -114,12 +114,18 @@ void prompt(const char *path)
 
 static void free_cmd(Cmd *cmd)
 {
+  int i;
   Cmd *tmp;
   while (cmd) {
     tmp = cmd;
     cmd = cmd->next;
     free(tmp->cmd);
     free(tmp->argv);
+    for (i = 0; i < tmp->argv->size; ++i) {
+      free(vec_get(tmp->argv, i));
+    }
+    free(tmp->rd_in);
+    free(tmp->rd_out);
     free(tmp);
   }
 }
@@ -131,7 +137,6 @@ static void free_cmds(Vector *cmds)
     Cmd *cmd = vec_get(cmds, i);
     free_cmd(cmd);
   }
-  vec_clear(cmds);
 }
 
 static char *expect_cmd(TokenPtr *tp)
@@ -190,3 +195,4 @@ char *substr(char *str, int len)
   strncpy(sub, str, len);
   return sub;
 }
+
