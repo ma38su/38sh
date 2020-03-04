@@ -35,7 +35,7 @@ $ command1 | command2 # command1 STDOUT to command2 STDIN
 
 ```
 $ command > file      # STDOUT to File (Create & Truncate)
-$ command >> file     # Stdout to File (Create & Append)
+$ command >> file     # STDOUT to File (Create & Append)
 ```
 
 ## Author
