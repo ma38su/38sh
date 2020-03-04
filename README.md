@@ -12,6 +12,12 @@ Run make to build:
 make
 ```
 
+## How to run
+
+```
+./38sh
+```
+
 ### Supported Built-in Command
 - cd/chdir
 - exit
@@ -25,17 +31,23 @@ $ cat Hello World | grep 'Hello World'
 Hello World
 ```
 
-### Supported Pipe
+### Supported Redirection and Pipe
 
 ```
-$ command1 | command2 # command1 STDOUT to command2 STDIN
+$ command < File      # Input Redirection
+$ command > File      # Output Redirection (Create & Truncate)
+$ command >> File     # Output Redirection (Create & Append)
 ```
 
-### Supported Redirect
+```
+$ command1 | command2 # Pipe
+```
+
+Input/Output Redirection and Pipe can be used in combination.
 
 ```
-$ command > file      # STDOUT to File (Create & Truncate)
-$ command >> file     # STDOUT to File (Create & Append)
+$ command < file1 > file2      # file1 to STDIN, STDOUT to file2
+$ command1 < file1 | commmand2 | command3 > file2 # file1 to STDIN, STDOUT to file2
 ```
 
 ## Author
