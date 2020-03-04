@@ -20,11 +20,12 @@ make
 
 ## Supported Features
 
-### Built-in Command
+### Built-in Commands
+
 - cd/chdir
 - exit
 
-### Environment variables is read only.
+### Environment Variables
 
 Environment variables is supported to read only.
 
