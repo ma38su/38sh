@@ -63,18 +63,20 @@ static Cmd *command(TokenPtr *tp)
 
 void prompt(const char *path)
 {
+  int i;
   FILE *f;
   TokenPtr tp;
 
   if (path) {
     f = fopen(path, "r");
     if (!f) {
-      die(path);
+      die("path: %s", path);
     }
   } else {
     f = stdin;
   }
 
+  Vector *cmds = new_vector();
 
   char *line;
   for (;;) {
@@ -87,12 +89,20 @@ void prompt(const char *path)
     if (!tp.token) {
       continue;
     }
-    Cmd *cmd = parse(&tp);
-    if (tp.token) {
-      die("syntax error");
-    }
 
-    do_cmd(cmd);
+    do {
+      Cmd *cmd = parse(&tp);
+      vec_add(cmds, cmd);
+    } while (consume(&tp, "&&") || consume(&tp, ";"));
+    if (tp.token) {
+      fprintf(stderr, "syntax error\n");
+      continue;
+    }
+    for (i = 0; i < cmds->size; ++i) {
+      Cmd *cmd = vec_get(cmds, i);
+      do_cmd(cmd);
+    }
+    vec_clear(cmds);
   }
   fclose(f);
 }

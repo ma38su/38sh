@@ -35,6 +35,13 @@ void vec_add(Vector *vector, void *value) {
 }
 
 void *vec_get(const Vector *vector, const int index) {
+  if (index > vector->size) {
+    return NULL;
+  }
   return vector->_array[index];
+}
+
+void vec_clear(Vector *vector) {
+  vector->size = 0;
 }
 

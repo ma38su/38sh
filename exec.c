@@ -107,7 +107,7 @@ static void do_exec(Cmd *cmd_head)
         argv[i] = (char*) vec_get(cmd->argv, i);
       }
       execv(cmd_path, argv);
-      die(cmd_path);
+      die("illegal exec: %s", cmd_path);
     }
     cmd = cmd->next;
 
@@ -162,10 +162,12 @@ static bool search_exec(char* cmd, char* cmd_path)
   char *path;
 
   if (strchr(cmd, '/')) {
+    strcat(cmd_path, cmd);
     return is_file(cmd);
   }
   strcpy(BUF, getenv("PATH"));
   if (strlen(BUF) == 0) {
+    strcat(cmd_path, cmd);
     return is_file(cmd);
   }
 
