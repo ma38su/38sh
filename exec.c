@@ -160,14 +160,14 @@ static int get_home(char* buf)
 static bool search_exec(char* cmd, char* cmd_path)
 {
   char *path;
-
   if (strchr(cmd, '/')) {
-    strcat(cmd_path, cmd);
+    strcpy(cmd_path, cmd);
     return is_file(cmd);
   }
+
   strcpy(BUF, getenv("PATH"));
   if (strlen(BUF) == 0) {
-    strcat(cmd_path, cmd);
+    strcpy(cmd_path, cmd);
     return is_file(cmd);
   }
 
