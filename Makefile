@@ -1,6 +1,6 @@
 CFLAGS=-Wall -std=c11 -g -static
-SRCS=main.c token.c parser.c exec.c debug.c
-OBJS=main.o token.o parser.o exec.o debug.o
+SRCS=main.c token.c parse.c exec.c debug.c
+OBJS=main.o token.o parse.o exec.o debug.o
 #SRCS=$(wildcard *.c)
 #OBJS=$(SRCS:.c=.o)
 

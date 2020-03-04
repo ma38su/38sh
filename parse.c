@@ -22,6 +22,8 @@ static bool consume(TokenPtr *tp, char *op);
 static Cmd *command(TokenPtr *tp);
 static Cmd *parse(TokenPtr *tp);
 
+static void free_cmds(Vector *cmds);
+
 static Cmd *parse(TokenPtr *tp)
 {
   Cmd *cmd = command(tp);
@@ -104,13 +106,36 @@ void prompt(const char *path)
       Cmd *cmd = vec_get(cmds, i);
       do_cmd(cmd);
     }
-    vec_clear(cmds);
+    free_cmds(cmds);
     free_token(tp);
   }
   fclose(f);
 }
 
-static char *expect_cmd(TokenPtr *tp) {
+static void free_cmd(Cmd *cmd)
+{
+  Cmd *tmp;
+  while (cmd) {
+    tmp = cmd;
+    cmd = cmd->next;
+    free(tmp->cmd);
+    free(tmp->argv);
+    free(tmp);
+  }
+}
+
+static void free_cmds(Vector *cmds)
+{
+  int i;
+  for (i = 0; i < cmds->size; ++i) {
+    Cmd *cmd = vec_get(cmds, i);
+    free_cmd(cmd);
+  }
+  vec_clear(cmds);
+}
+
+static char *expect_cmd(TokenPtr *tp)
+{
   if (tp->token->kind != TK_TEXT) {
     die("not cmd");
   }
@@ -119,7 +144,8 @@ static char *expect_cmd(TokenPtr *tp) {
   return cmd;
 }
 
-static bool consume(TokenPtr *tp, char *op) {
+static bool consume(TokenPtr *tp, char *op)
+{
   if (tp->token && tp->token->kind == TK_RESERVED
       && strlen(op) == tp->token->len
       && memcmp(op, tp->token->str, tp->token->len) == 0) {
@@ -130,7 +156,8 @@ static bool consume(TokenPtr *tp, char *op) {
   return false;
 }
 
-static char *expect_arg(TokenPtr *tp) {
+static char *expect_arg(TokenPtr *tp)
+{
   char *arg = consume_arg(tp);
   if (!arg) {
     die("not arg");
@@ -138,7 +165,8 @@ static char *expect_arg(TokenPtr *tp) {
   return arg;
 }
 
-static char *consume_arg(TokenPtr *tp) {
+static char *consume_arg(TokenPtr *tp)
+{
   if (tp->token->kind != TK_TEXT && tp->token->kind != TK_STR) {
     return NULL;
   }
@@ -147,7 +175,8 @@ static char *consume_arg(TokenPtr *tp) {
   return arg;
 }
 
-static char *read_line(FILE *f) {
+static char *read_line(FILE *f)
+{
   static char BUF[DEFAULT_BUF_SIZE];
   if (fgets(BUF, DEFAULT_BUF_SIZE, f) == NULL) {
     return NULL;
@@ -155,7 +184,8 @@ static char *read_line(FILE *f) {
   return BUF;
 }
 
-char *substr(char *str, int len) {
+char *substr(char *str, int len)
+{
   char *sub = calloc(len + 1, sizeof(char));
   strncpy(sub, str, len);
   return sub;
