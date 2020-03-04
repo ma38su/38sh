@@ -25,14 +25,18 @@ static Cmd *parse(TokenPtr *tp);
 static Cmd *parse(TokenPtr *tp)
 {
   Cmd *cmd = command(tp);
-  if (consume(tp, ">")) {
-    cmd->redirect = expect_arg(tp);
-    cmd->redirect_flags = O_WRONLY | O_CREAT | O_TRUNC;
-  } else if (consume(tp, ">>")) {
-    cmd->redirect = expect_arg(tp);
-    cmd->redirect_flags = O_WRONLY | O_CREAT | O_APPEND;
-  } else if (consume(tp, "|")) {
+  if (consume(tp, "<")) {
+    cmd->rd_in = expect_arg(tp);
+  }
+
+  if (consume(tp, "|")) {
     cmd->next = parse(tp);
+  } else if (consume(tp, ">")) {
+    cmd->rd_out = expect_arg(tp);
+    cmd->rd_out_flags = O_WRONLY | O_CREAT | O_TRUNC;
+  } else if (consume(tp, ">>")) {
+    cmd->rd_out = expect_arg(tp);
+    cmd->rd_out_flags = O_WRONLY | O_CREAT | O_APPEND;
   }
   return cmd;
 }

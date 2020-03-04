@@ -84,16 +84,22 @@ static void do_exec(Cmd *cmd_head)
         // not head
         connect(fds1[0], STDIN_FILENO);
         close(fds1[1]);
+      } else if (cmd->rd_in) {
+        // head
+        int fd = open(cmd->rd_in, O_RDONLY);
+        if (fd < 0) die("input redirection");
+        connect(fd, STDIN_FILENO);
       }
+
       if (cmd->next) {
         // not tail
         close(fds2[0]);
         connect(fds2[1], STDOUT_FILENO);
-      } else if (cmd->redirect) {
-        int fd = open(cmd->redirect, cmd->redirect_flags, 0644);
-        if (fd < 0) die("redirect");
+      } else if (cmd->rd_out) {
+        // tail
+        int fd = open(cmd->rd_out, cmd->rd_out_flags, 0644);
+        if (fd < 0) die("output redirection");
         connect(fd, STDOUT_FILENO);
-        close(fd);
       }
 
       argv = calloc(cmd->argv->size + 1, sizeof(char*));

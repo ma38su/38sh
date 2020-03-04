@@ -31,8 +31,9 @@ struct Cmd {
   char* cmd;
   Vector* argv;
   Cmd *next;
-  char* redirect;
-  mode_t redirect_flags;
+  char* rd_in;
+  char* rd_out;
+  mode_t rd_out_flags;
 };
 
 void print_header();
