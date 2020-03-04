@@ -24,16 +24,14 @@ make
 - cd/chdir
 - exit
 
-### Supported String Literal
+### String Literal
 
 ```
-$ cat Hello World | grep "Hello World"
-Hello World
-$ cat Hello World | grep 'Hello World'
-Hello World
+$ grep "Hello World" *
+$ grep 'Hello World' *
 ```
 
-### Supported Redirection and Pipe
+### Redirection and Pipe
 
 ```
 $ command < File      # Input Redirection
@@ -50,6 +48,13 @@ Input/Output Redirection and Pipe can be used in combination.
 ```
 $ command < File1 > File2
 $ command1 < File1 | command2 > File2
+```
+
+### Multi Commands in one line
+
+```
+$ command1 && command2
+$ command1; command2
 ```
 
 ## Author
