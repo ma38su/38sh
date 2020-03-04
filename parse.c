@@ -106,7 +106,7 @@ void prompt(const char *path)
       Cmd *cmd = vec_get(cmds, i);
       do_cmd(cmd);
     }
-    free_cmds(cmds);
+    //free_cmds(cmds);
     free_token(tp);
   }
   fclose(f);
@@ -137,6 +137,7 @@ static void free_cmds(Vector *cmds)
     Cmd *cmd = vec_get(cmds, i);
     free_cmd(cmd);
   }
+  vec_clear(cmds);
 }
 
 static char *expect_cmd(TokenPtr *tp)
