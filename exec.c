@@ -102,9 +102,10 @@ static void do_exec(Cmd *cmd_head)
         connect(fd, STDOUT_FILENO);
       }
 
-      argv = calloc(cmd->argv->size + 1, sizeof(char*));
+      argv = calloc(cmd->argv->size + 2, sizeof(char*));
+      argv[0] = cmd->cmd;
       for (i = 0; i < cmd->argv->size; ++i) {
-        argv[i] = (char*) vec_get(cmd->argv, i);
+        argv[i+1] = (char*) vec_get(cmd->argv, i);
       }
       execv(cmd_path, argv);
       die("illegal exec: %s", cmd_path);

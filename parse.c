@@ -52,7 +52,6 @@ static Cmd *command(TokenPtr *tp)
   cmd->cmd = expect_cmd(tp);
   cmd->argv = new_vector();
 
-  vec_add(cmd->argv, cmd->cmd);
   while (tp->token) {
     char *arg = consume_arg(tp);
     if (!arg) {
@@ -106,7 +105,7 @@ void prompt(const char *path)
       Cmd *cmd = vec_get(cmds, i);
       do_cmd(cmd);
     }
-    //free_cmds(cmds);
+    free_cmds(cmds);
     free_token(tp);
   }
   fclose(f);
@@ -119,13 +118,17 @@ static void free_cmd(Cmd *cmd)
   while (cmd) {
     tmp = cmd;
     cmd = cmd->next;
+
     free(tmp->cmd);
-    free(tmp->argv);
     for (i = 0; i < tmp->argv->size; ++i) {
-      free(vec_get(tmp->argv, i));
+      void *arg = vec_get(tmp->argv, i);
+      free(arg);
     }
-    free(tmp->rd_in);
-    free(tmp->rd_out);
+    free(tmp->argv);
+
+    if (tmp->rd_in) free(tmp->rd_in);
+    if (tmp->rd_out) free(tmp->rd_out);
+
     free(tmp);
   }
 }
