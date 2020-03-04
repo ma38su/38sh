@@ -12,30 +12,53 @@ Run make to build:
 make
 ```
 
-### Supported Built-in Command
+## How to run
+
+```
+./38sh
+```
+
+## Supported Features
+
+### Built-in Command
 - cd/chdir
 - exit
 
-### Supported String Literal
+### String Literal
 
 ```
-$ cat Hello World | grep "Hello World"
-Hello World
-$ cat Hello World | grep 'Hello World'
-Hello World
+$ grep "Hello World" *
+$ grep 'Hello World' *
 ```
 
-### Supported Pipe
+### Redirection and Pipe
 
 ```
-$ command1 | command2 # command1 STDOUT to command2 STDIN
+$ command < File      # Input Redirection
+$ command > File      # Output Redirection (Create & Truncate)
+$ command >> File     # Output Redirection (Create & Append)
 ```
 
-### Supported Redirect
+```
+$ command1 | command2 # Pipe
+```
+
+Input/Output Redirection and Pipe can be used in combination.
 
 ```
-$ command > file      # STDOUT to File (Create & Truncate)
-$ command >> file     # STDOUT to File (Create & Append)
+$ command < File1 > File2
+$ command1 < File1 | command2 > File2
+```
+
+### Multi Commands in one line
+
+```
+$ echo hello && world
+hello
+world
+$ echo hello; echo world
+hello
+world
 ```
 
 ## Author
