@@ -24,11 +24,24 @@ make
 - cd/chdir
 - exit
 
+### Environment variables is read only.
+
+Environment variables is supported to read only.
+
+```
+$ echo $HOME
+/home/ma38su
+$ echo ${HOME}
+/home/ma38su
+```
+
 ### String Literal
 
 ```
-$ grep "Hello World" *
-$ grep 'Hello World' *
+$ echo "$HOME"
+/home/ma38su
+$ echo '$HOME'
+$HOME
 ```
 
 ### Redirection and Pipe
