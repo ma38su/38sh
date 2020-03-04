@@ -108,8 +108,6 @@ Token *tokenize(char *p) {
     }
     die("unexpected token");
   }
-  new_token(TK_EOF, cur, p);
-
   return head.next;
 }
 

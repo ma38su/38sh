@@ -15,45 +15,49 @@
 static char *read_line(FILE *f);
 
 static char *expect_cmd(TokenPtr *tp);
+static char *expect_arg(TokenPtr *tp);
 static char *consume_arg(TokenPtr *tp);
 static bool consume(TokenPtr *tp, char *op);
 
-static Stmt *stmt(TokenPtr *tp);
-static Stmt *parse(TokenPtr *tp);
+static Cmd *command(TokenPtr *tp);
+static Cmd *parse(TokenPtr *tp);
 
-static void print_header();
-
-static Stmt *parse(TokenPtr *tp)
+static Cmd *parse(TokenPtr *tp)
 {
-  Stmt *st = stmt(tp);
-  if (consume(tp, "|")) {
-    st->next = parse(tp);
+  Cmd *cmd = command(tp);
+  if (consume(tp, ">")) {
+    cmd->redirect = expect_arg(tp);
+    cmd->redirect_flags = O_WRONLY | O_CREAT | O_TRUNC;
+  } else if (consume(tp, ">>")) {
+    cmd->redirect = expect_arg(tp);
+    cmd->redirect_flags = O_WRONLY | O_CREAT | O_APPEND;
+  } else if (consume(tp, "|")) {
+    cmd->next = parse(tp);
   }
-  return st;
+  return cmd;
 }
 
-static Stmt *stmt(TokenPtr *tp)
+static Cmd *command(TokenPtr *tp)
 {
-  Stmt *st;
-  st = calloc(1, sizeof(Stmt));
+  Cmd *cmd;
+  cmd = calloc(1, sizeof(Cmd));
 
-  st->cmd = expect_cmd(tp);
-  st->argv = new_vector();
-  st->in = -1;
-  st->out = -1;
+  cmd->pid = 0;
+  cmd->cmd = expect_cmd(tp);
+  cmd->argv = new_vector();
 
-  vec_add(st->argv, st->cmd);
+  vec_add(cmd->argv, cmd->cmd);
   while (tp->token) {
     char *arg = consume_arg(tp);
     if (!arg) {
       break;
     }
-    vec_add(st->argv, arg);
+    vec_add(cmd->argv, arg);
   }
-  return st;
+  return cmd;
 }
 
-void do_sh(const char *path)
+void prompt(const char *path)
 {
   FILE *f;
   TokenPtr tp;
@@ -67,23 +71,26 @@ void do_sh(const char *path)
     f = stdin;
   }
 
-  print_header();
 
   char *line;
-  while ((line = read_line(f)) != NULL) {
+  for (;;) {
+    if (term) print_header();
+
+    line = read_line(f);
+    if (!line) break;
+
     tp.token = tokenize(line);
-    Stmt *stmt = parse(&tp);
-    while (stmt) {
-      do_stmt(stmt);
-      stmt = stmt->next;
+    if (!tp.token) {
+      continue;
     }
-    print_header();
+    Cmd *cmd = parse(&tp);
+    if (tp.token) {
+      die("syntax error");
+    }
+
+    do_cmd(cmd);
   }
   fclose(f);
-}
-
-static void print_header() {
-  printf("38sh$ ");
 }
 
 static char *expect_cmd(TokenPtr *tp) {
@@ -104,6 +111,14 @@ static bool consume(TokenPtr *tp, char *op) {
     return true;
   }
   return false;
+}
+
+static char *expect_arg(TokenPtr *tp) {
+  char *arg = consume_arg(tp);
+  if (!arg) {
+    die("not arg");
+  }
+  return arg;
 }
 
 static char *consume_arg(TokenPtr *tp) {
