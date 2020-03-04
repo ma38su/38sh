@@ -187,20 +187,19 @@ char *extract_env(char *str, int len) {
     strncat(buf, p0, p - p0);
     len -= p - p0;
     p0 = p++;
+    char *key;
     if (*p == '{') {
       ++p;
       while ((p - p0) < len && *p != '}') ++p;
       if ((p - p0) >= len) break;
-      char *key = substr(p0 + 2, p - p0 - 2);
-      char *val = getenv(key); 
+      key = substr(p0 + 2, p - p0 - 2);
       p++;
-      strcat(buf, val);
     } else {
       while ((p - p0) < len && !isspace(*p) && *p != '$') ++p;
-      char *key = substr(p0 + 1, p - p0 - 1);
-      char *val = getenv(key); 
-      strcat(buf, val);
+      key = substr(p0 + 1, p - p0 - 1);
     }
+    char *val = getenv(key); 
+    if (val) strcat(buf, val);
     len -= p - p0;
     p0 = p;
     p = memchr(p0, '$', len);
