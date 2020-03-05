@@ -11,6 +11,9 @@ $(OBJS): 38sh.h $(SRCS)
 
 vector.o: vector.h vector.c
 
+test: 38sh test.sh
+	bash test.sh
+
 clean:
 	rm -f 38sh *.s *.o *~ tmp/* .*.c
 
