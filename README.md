@@ -64,8 +64,11 @@ $ command < File      # STDIN Redirection
 $ command > File      # STDOUT Redirection (Create & Truncate)
 $ command >> File     # STDOUT Redirection (Create & Append)
 
-$ command 2> File      # STDERR Redirection (Create & Truncate)
-$ command 2>> File     # STDERR Redirection (Create & Append)
+$ command 2> File     # STDERR Redirection (Create & Truncate)
+$ command 2>> File    # STDERR Redirection (Create & Append)
+
+$ command &> File     # STDOUT & STDERR Redirection (Create & Truncate)
+$ command &>> File    # STDOUT & STDERR Redirection (Create & Append)
 ```
 
 ```
