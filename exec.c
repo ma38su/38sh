@@ -12,6 +12,7 @@
 #include "vector.h"
 
 static void connect(int fd1, int fd2);
+static void connect2(int fd1, int fd2, int fd3);
 static void do_exec(Cmd *cmd);
 static void do_cd(const Vector *argv);
 static bool search_exec(char *cmd, char *buf);
@@ -30,6 +31,17 @@ static void connect(int fd1, int fd2)
 {
   close(fd2);
   dup2(fd1, fd2);
+  close(fd1);
+}
+
+static void connect2(int fd1, int fd2, int fd3)
+{
+  close(fd2);
+  dup2(fd1, fd2);
+
+  close(fd3);
+  dup2(fd1, fd3);
+
   close(fd1);
 }
 
@@ -99,10 +111,14 @@ static void do_exec(Cmd *cmd_head)
         // tail
         int fd = open(cmd->rd_out, cmd->rd_out_flags, 0644);
         if (fd < 0) die("stdout redirection");
-        connect(fd, STDOUT_FILENO);
+        if (cmd->rd_out != cmd->rd_err) {
+          connect(fd, STDOUT_FILENO);
+        } else {
+          connect2(fd, STDOUT_FILENO, STDERR_FILENO);
+        }
       }
 
-      if (cmd->rd_err) {
+      if (cmd->rd_err && cmd->rd_err != cmd->rd_out) {
         int fd = open(cmd->rd_err, cmd->rd_err_flags, 0644);
         if (fd < 0) die("stderr redirection");
         connect(fd, STDERR_FILENO);

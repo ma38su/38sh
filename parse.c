@@ -40,9 +40,21 @@ static Cmd *parse(TokenPtr *tp)
       cmd->rd_out = expect_arg(tp);
       cmd->rd_out_flags = O_WRONLY | O_CREAT | O_APPEND;
       continue;
+    } else if (consume(tp, "&>")) {
+      cmd->rd_out = expect_arg(tp);
+      cmd->rd_err = cmd->rd_out;
+      cmd->rd_out_flags = O_WRONLY | O_CREAT | O_TRUNC;
+      cmd->rd_err_flags = cmd->rd_out_flags;
+      continue;
     } else if (consume(tp, ">")) {
       cmd->rd_out = expect_arg(tp);
       cmd->rd_out_flags = O_WRONLY | O_CREAT | O_TRUNC;
+      continue;
+    } else if (consume(tp, "&>>")) {
+      cmd->rd_out = expect_arg(tp);
+      cmd->rd_err = cmd->rd_out;
+      cmd->rd_out_flags = O_WRONLY | O_CREAT | O_APPEND;
+      cmd->rd_err_flags = cmd->rd_out_flags;
       continue;
     }
 

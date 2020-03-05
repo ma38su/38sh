@@ -44,6 +44,13 @@ try '38err' "./test/caterr 38err 2> $TMP_ERR; cat $TMP_ERR"
 try '38err
 38err' "./test/caterr 38err 2> $TMP_ERR; ./test/caterr 38err 2>> $TMP_ERR; cat $TMP_ERR"
 
+try 'shell' "echo shell &> $TMP_OUT; cat $TMP_OUT"
+try 'shell
+shell2' "echo shell2 &>> $TMP_OUT; cat $TMP_OUT"
+try 'shell' "./test/caterr shell &> $TMP_OUT; cat $TMP_OUT"
+try 'shell
+shell2' "./test/caterr shell2 &>> $TMP_OUT; cat $TMP_OUT"
+
 try $HOME 'echo $HOME'
 try $HOME 'echo "$HOME"'
 try $HOME 'echo ${HOME}'

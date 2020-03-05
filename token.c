@@ -74,15 +74,15 @@ TokenPtr *tokenize(char *p)
     if (memcmp(p, "&>>", 3) == 0) {
       // stdout & stderr > file
       cur = new_token(TK_RESERVED, cur, p);
-      cur->len = 2;
-      p += 2;
+      cur->len = 3;
+      p += 3;
       continue;
     }
     if (memcmp(p, ">&2", 3) == 0) {
       // stdout > stderr
       cur = new_token(TK_RESERVED, cur, p);
-      cur->len = 2;
-      p += 2;
+      cur->len = 3;
+      p += 3;
       continue;
     }
     if (memcmp(p, "2>>", 3) == 0) {
@@ -91,6 +91,7 @@ TokenPtr *tokenize(char *p)
       p += 3;
       continue;
     }
+
     if (memcmp(p, ">>", 2) == 0) {
       cur = new_token(TK_RESERVED, cur, p);
       cur->len = 2;
@@ -115,6 +116,7 @@ TokenPtr *tokenize(char *p)
       p += 2;
       continue;
     }
+
     if (strchr("|&><;", *p)) {
       cur = new_token(TK_RESERVED, cur, p++);
       cur->len = 1;
