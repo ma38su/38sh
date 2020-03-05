@@ -60,12 +60,12 @@ $HOME
 ### Redirection and Pipe
 
 ```
-$ command < File      # Input Redirection
-$ command > File      # Output Redirection (Create & Truncate)
-$ command >> File     # Output Redirection (Create & Append)
+$ command < File      # STDIN Redirection
+$ command > File      # STDOUT Redirection (Create & Truncate)
+$ command >> File     # STDOUT Redirection (Create & Append)
 
-$ command 2> File      # Stderr Redirection (Create & Truncate)
-$ command 2>> File     # Stderr Redirection (Create & Append)
+$ command 2> File      # STDERR Redirection (Create & Truncate)
+$ command 2>> File     # STDERR Redirection (Create & Append)
 ```
 
 ```
