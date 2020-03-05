@@ -32,14 +32,22 @@ static Cmd *parse(TokenPtr *tp)
     cmd->rd_in = expect_arg(tp);
   }
 
+  if (consume(tp, "2>>")) {
+    cmd->rd_err = expect_arg(tp);
+    cmd->rd_err_flags = O_WRONLY | O_CREAT | O_APPEND;
+  } else if (consume(tp, "2>")) {
+    cmd->rd_err = expect_arg(tp);
+    cmd->rd_err_flags = O_WRONLY | O_CREAT | O_TRUNC;
+  }
+
   if (consume(tp, "|")) {
     cmd->next = parse(tp);
-  } else if (consume(tp, ">")) {
-    cmd->rd_out = expect_arg(tp);
-    cmd->rd_out_flags = O_WRONLY | O_CREAT | O_TRUNC;
   } else if (consume(tp, ">>")) {
     cmd->rd_out = expect_arg(tp);
     cmd->rd_out_flags = O_WRONLY | O_CREAT | O_APPEND;
+  } else if (consume(tp, ">")) {
+    cmd->rd_out = expect_arg(tp);
+    cmd->rd_out_flags = O_WRONLY | O_CREAT | O_TRUNC;
   }
   return cmd;
 }

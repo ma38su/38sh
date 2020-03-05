@@ -35,6 +35,8 @@ struct Cmd {
   char* rd_in;
   char* rd_out;
   mode_t rd_out_flags;
+  char* rd_err;
+  mode_t rd_err_flags;
 };
 
 void print_header();

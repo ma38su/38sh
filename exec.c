@@ -87,7 +87,7 @@ static void do_exec(Cmd *cmd_head)
       } else if (cmd->rd_in) {
         // head
         int fd = open(cmd->rd_in, O_RDONLY);
-        if (fd < 0) die("input redirection");
+        if (fd < 0) die("stdin redirection");
         connect(fd, STDIN_FILENO);
       }
 
@@ -98,8 +98,14 @@ static void do_exec(Cmd *cmd_head)
       } else if (cmd->rd_out) {
         // tail
         int fd = open(cmd->rd_out, cmd->rd_out_flags, 0644);
-        if (fd < 0) die("output redirection");
+        if (fd < 0) die("stdout redirection");
         connect(fd, STDOUT_FILENO);
+      }
+
+      if (cmd->rd_err) {
+        int fd = open(cmd->rd_err, cmd->rd_err_flags, 0644);
+        if (fd < 0) die("stderr redirection");
+        connect(fd, STDERR_FILENO);
       }
 
       argv = calloc(cmd->argv->size + 2, sizeof(char*));
