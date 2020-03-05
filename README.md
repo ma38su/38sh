@@ -63,6 +63,9 @@ $HOME
 $ command < File      # Input Redirection
 $ command > File      # Output Redirection (Create & Truncate)
 $ command >> File     # Output Redirection (Create & Append)
+
+$ command 2> File      # Stderr Redirection (Create & Truncate)
+$ command 2>> File     # Stderr Redirection (Create & Append)
 ```
 
 ```
