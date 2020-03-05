@@ -11,10 +11,13 @@
 #include "38sh.h"
 #include "vector.h"
 
+extern char **environ;
+
 static void connect(int fd1, int fd2);
 static void connect2(int fd1, int fd2, int fd3);
 static void do_exec(Cmd *cmd);
-static void do_cd(const Vector *argv);
+static void do_cd(const char *cmd, const Vector *argv);
+static void do_export(const Vector *argv);
 static bool search_exec(char *cmd, char *buf);
 static int get_home(char *buf);
 
@@ -50,8 +53,12 @@ bool do_builtin(Cmd *cmd)
   if (strcmp(cmd->cmd, "exit") == 0) {
     exit(0);
   }
+  if (strcmp(cmd->cmd, "export") == 0) {
+    do_export(cmd->argv);
+    return true;
+  }
   if (strcmp(cmd->cmd, "chdir") == 0 || strcmp(cmd->cmd, "cd") == 0) {
-    do_cd(cmd->argv);
+    do_cd(cmd->cmd, cmd->argv);
     return true;
   }
   return false;
@@ -145,33 +152,57 @@ static void do_exec(Cmd *cmd_head)
   }
 }
 
-static void do_cd(const Vector *argv)
+static void do_export(const Vector *argv)
+{
+  if (argv->size == 0) {
+    char **p;
+    for (p = environ; *p; p++) {
+      printf("%s\n", *p);
+    }
+    // print all env vars
+  } else {
+    int i;
+    for (i = 0; i < argv->size; ++i) {
+      char *var = vec_get(argv, i);
+      printf("var %s\n", var);
+    }
+  }
+}
+
+static void do_cd(const char *cmd, const Vector *argv)
 {
   char *dir;
   int argc = argv->size;
-  if (argc == 0) die("illegal cd");
-  if (argc == 1) {
+  if (argc == 0) {
     if (get_home(BUF)) {
       dir = BUF;
     }
-  } else if (argc == 2) {
-    dir = (char*) vec_get(argv, 1);
+  } else if (argc == 1) {
+    dir = (char*) vec_get(argv, 0);
     if (*dir == '~' && get_home(BUF)) {
       strcat(BUF, dir+1);
       dir = BUF;
     }
   } else {
-    char *cmd = (char*) vec_get(argv, 1);
     fprintf(stderr, "%s: too many arguments\n", cmd);
     return;
   }
   if (chdir(dir) < 0) die(dir);
 }
 
+static void get_env(char *key, char *buf) {
+  char *val = getenv(key);
+  if (val) {
+    strcpy(buf, val);
+  } else {
+    buf[0] = '\0';
+  }
+}
+
 static int get_home(char* buf)
 {
   int len;
-  strcpy(buf, getenv("HOME"));
+  get_env("HOME", buf);
   len = strlen(buf);
   while (len > 0 && buf[len - 1] == '/') {
     len--;
@@ -188,7 +219,7 @@ static bool search_exec(char* cmd, char* cmd_path)
     return is_file(cmd);
   }
 
-  strcpy(BUF, getenv("PATH"));
+  get_env("PATH", BUF);
   if (strlen(BUF) == 0) {
     strcpy(cmd_path, cmd);
     return is_file(cmd);
