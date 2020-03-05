@@ -12,10 +12,22 @@ Run make to build:
 make
 ```
 
+Run make to build and test:
+
+```
+make test
+```
+
 ## How to run
 
 ```
 ./38sh
+```
+
+or 
+
+```
+./38sh input.sh
 ```
 
 ## Supported Features
