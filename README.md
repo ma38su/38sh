@@ -57,6 +57,13 @@ $ echo '$HOME'
 $HOME
 ```
 
+### Pipe
+
+```
+$ command1 | command2
+$ command1 | command2 | command3
+```
+
 ### Redirection
 
 ```
@@ -76,12 +83,6 @@ Input/Output Redirection and Pipe can be used in combination.
 ```
 $ command < File1 > File2
 $ command1 < File1 | command2 > File2
-```
-
-### Pipe
-
-```
-$ command1 | command2
 ```
 
 ### Multi Commands in one line
