@@ -41,3 +41,4 @@ try "$HOME $PATH" 'echo "$HOME ${PATH}"'
 try "$HOME $PATH" 'echo "${HOME} $PATH"'
 try "$HOME $PATH" 'echo "${HOME} ${PATH}"'
 
+echo "All tests are passed."
