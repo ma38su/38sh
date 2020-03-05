@@ -85,6 +85,12 @@ TokenPtr *tokenize(char *p)
       p += 2;
       continue;
     }
+    if (memcmp(p, "2>>", 3) == 0) {
+      cur = new_token(TK_RESERVED, cur, p);
+      cur->len = 3;
+      p += 3;
+      continue;
+    }
     if (memcmp(p, ">>", 2) == 0) {
       cur = new_token(TK_RESERVED, cur, p);
       cur->len = 2;

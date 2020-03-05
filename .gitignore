@@ -1,2 +1,4 @@
 *.o
 38sh
+tmp
+test/caterr

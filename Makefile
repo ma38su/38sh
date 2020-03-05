@@ -11,10 +11,13 @@ $(OBJS): 38sh.h $(SRCS)
 
 vector.o: vector.h vector.c
 
-test: 38sh test.sh
+caterr: test/caterr.c
+	$(CC) -o test/caterr test/caterr.c
+
+test: 38sh test.sh caterr
 	bash test.sh
 
 clean:
-	rm -f 38sh *.s *.o *~ tmp/* .*.c
+	rm -f 38sh *.s *.o *~ tmp/* .*.c test/caterr
 
 .PHONY: test clean
