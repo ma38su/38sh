@@ -57,19 +57,25 @@ $ echo '$HOME'
 $HOME
 ```
 
-### Redirection and Pipe
+### Pipe
+
+```
+$ command1 | command2
+$ command1 | command2 | command3
+```
+
+### Redirection
 
 ```
 $ command < File      # STDIN Redirection
 $ command > File      # STDOUT Redirection (Create & Truncate)
 $ command >> File     # STDOUT Redirection (Create & Append)
 
-$ command 2> File      # STDERR Redirection (Create & Truncate)
-$ command 2>> File     # STDERR Redirection (Create & Append)
-```
+$ command 2> File     # STDERR Redirection (Create & Truncate)
+$ command 2>> File    # STDERR Redirection (Create & Append)
 
-```
-$ command1 | command2 # Pipe
+$ command &> File     # STDOUT & STDERR Redirection (Create & Truncate)
+$ command &>> File    # STDOUT & STDERR Redirection (Create & Append)
 ```
 
 Input/Output Redirection and Pipe can be used in combination.
